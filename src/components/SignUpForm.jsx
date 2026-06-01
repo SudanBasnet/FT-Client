@@ -2,23 +2,17 @@ import { Form, Button } from "react-bootstrap";
 import { CustomInput } from "./CustomInput";
 import { useState } from "react";
 import { toast } from "react-toastify";
+import { postNewUser } from "../../helpers/axiosHelper";
 
 const Signupform = () => {
   const [form, setForm] = useState({});
   const fields = [
     {
-      label: "First Name",
+      label: "name",
       type: "text",
       required: true,
-      placeholder: "Enter your first name",
-      name: "firstName",
-    },
-    {
-      label: "Last Name",
-      type: "text",
-      required: true,
-      placeholder: "Enter your last name",
-      name: "lastName",
+      placeholder: "Enter your name",
+      name: "name",
     },
     {
       label: "email",
@@ -48,13 +42,29 @@ const Signupform = () => {
     console.log(name, value);
     setForm({ ...form, [name]: value });
   };
-  const handleOnSubmit = (e) => {
+  const handleOnSubmit = async (e) => {
     e.preventDefault();
     const { confirmPassword, ...rest } = form;
     if (confirmPassword !== rest.password) {
       return toast.error("Passwords do not match");
     }
-    console.log(form);
+    // const { status, message } = await postNewUser(rest);
+    // toast[status](message);
+
+    const { status, data, message } = await postNewUser(rest);
+
+    if (status === "success") {
+      const responseMessage = data?.message || "Account created successfully";
+      const isErrorResponse = data?.status?.toLowerCase() === "error";
+
+      if (isErrorResponse) {
+        toast.error(responseMessage);
+      } else {
+        toast.success(responseMessage);
+      }
+    } else {
+      toast.error(message || data?.message || "Something went wrong");
+    }
   };
   return (
     <div className="border p-4 rounded">
