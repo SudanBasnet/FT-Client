@@ -1,8 +1,11 @@
 import Container from "react-bootstrap/Container";
 import Nav from "react-bootstrap/Nav";
 import Navbar from "react-bootstrap/Navbar";
-import NavDropdown from "react-bootstrap/NavDropdown";
 import { Link } from "react-router-dom";
+import { ImExit } from "react-icons/im";
+import { FaSignInAlt } from "react-icons/fa";
+import { MdLogin } from "react-icons/md";
+import { GiCoins } from "react-icons/gi";
 
 export const Header = () => {
   return (
@@ -13,13 +16,15 @@ export const Header = () => {
         <Navbar.Collapse id="basic-navbar-nav">
           <Nav className="ms-auto">
             <Link className="nav-link" to="/signup">
+              <FaSignInAlt /> {""}
               Sign Up
             </Link>
             <Link className="nav-link" to="/">
+              <MdLogin /> {""}
               Login In
             </Link>
             <Link className="nav-link" to="/">
-              Logout
+              <ImExit /> Logout
             </Link>
           </Nav>
         </Navbar.Collapse>

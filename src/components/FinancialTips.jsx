@@ -1,4 +1,6 @@
 import { useEffect, useState } from "react";
+import { GiCoins } from "react-icons/gi";
+import { FaDollarSign } from "react-icons/fa";
 
 const financialTips = [
   {
@@ -76,6 +78,14 @@ export const FinancialTips = () => {
       className="d-flex flex-column justify-content-center"
       style={{ height: "100%" }}
     >
+      <div>
+        <GiCoins className="text-warning" style={{ fontSize: "10rem" }} />
+        <div className="">
+          <FaDollarSign className="text-warning" />
+          Watch your money Grow
+          <FaDollarSign className="text-warning" />
+        </div>
+      </div>
       <h3>{tip}</h3>
       <div className="fw-bolder">"{quote}"</div>
       <p> - {author}</p>
