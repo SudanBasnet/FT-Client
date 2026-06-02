@@ -3,13 +3,21 @@ import { CustomInput } from "./CustomInput";
 import useForm from "../hooks/useForm";
 import { loginUser } from "../../helpers/axiosHelper";
 import { toast } from "react-toastify";
+import { useUser } from "../context/UserContext";
+import { useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 const initialState = {
   email: "",
   password: "",
 };
 
 const SignInform = () => {
+  const navigate = useNavigate();
+  const { user, setUser } = useUser();
   const { form, setForm, handleOnchange } = useForm(initialState);
+  useEffect(() => {
+    user?._id && navigate("/dashboard");
+  }, [user?._id, navigate]);
   const fields = [
     {
       label: "email",
@@ -51,6 +59,7 @@ const SignInform = () => {
       });
 
       setForm(initialState);
+      setUser(data.user);
       console.log(data.user, data.accessJWT);
     } catch (error) {
       console.log(error);

@@ -1,6 +1,7 @@
 import { Navigate } from "react-router-dom";
+import { useUser } from "../context/UserContext";
 
 export const Auth = ({ children }) => {
-  const isLoggedin = false; // Replace with actual authentication logic
-  return isLoggedin ? children : <Navigate to="/" replace />;
+  const { user } = useUser();
+  return user?._id ? children : <Navigate to="/" replace />;
 };
