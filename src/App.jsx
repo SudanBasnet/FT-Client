@@ -6,6 +6,7 @@ import Signup from "./assets/pages/Signup.jsx";
 import { DefaultLayout } from "./components/layouts/DefaultLayout.jsx";
 import Transaction from "./assets/pages/Transaction.jsx";
 import Dashboard from "./assets/pages/Dashboard.jsx";
+import { Auth } from "./auth/Auth.jsx";
 
 const App = () => {
   return (
@@ -14,8 +15,22 @@ const App = () => {
         <Route path="/" element={<DefaultLayout />}>
           <Route index element={<Login />} />
           <Route path="signup" element={<Signup />} />
-          <Route path="transaction" element={<Transaction />} />
-          <Route path="dashboard" element={<Dashboard />} />
+          <Route
+            path="transaction"
+            element={
+              <Auth>
+                <Transaction />
+              </Auth>
+            }
+          />
+          <Route
+            path="dashboard"
+            element={
+              <Auth>
+                <Dashboard />
+              </Auth>
+            }
+          />
         </Route>
       </Routes>
       <ToastContainer />
