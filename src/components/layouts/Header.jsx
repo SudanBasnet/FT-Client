@@ -3,9 +3,8 @@ import Nav from "react-bootstrap/Nav";
 import Navbar from "react-bootstrap/Navbar";
 import { Link } from "react-router-dom";
 import { ImExit } from "react-icons/im";
-import { FaSignInAlt } from "react-icons/fa";
+import { FaReceipt, FaSignInAlt, FaTachometerAlt } from "react-icons/fa";
 import { MdLogin } from "react-icons/md";
-import { GiCoins } from "react-icons/gi";
 
 export const Header = () => {
   return (
@@ -22,6 +21,14 @@ export const Header = () => {
             <Link className="nav-link" to="/">
               <MdLogin /> {""}
               Login In
+            </Link>
+            <Link className="nav-link" to="/dashboard">
+              <FaTachometerAlt /> {""}
+              Dashboard
+            </Link>
+            <Link className="nav-link" to="/transaction">
+              <FaReceipt /> {""}
+              Transaction
             </Link>
             <Link className="nav-link" to="/">
               <ImExit /> Logout

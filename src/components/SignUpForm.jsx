@@ -1,11 +1,18 @@
 import { Form, Button } from "react-bootstrap";
 import { CustomInput } from "./CustomInput";
-import { useState } from "react";
 import { toast } from "react-toastify";
 import { postNewUser } from "../../helpers/axiosHelper";
+import useForm from "../hooks/useForm";
+
+const initialState = {
+  name: "",
+  email: "",
+  password: "",
+  confirmPassword: "",
+};
 
 const Signupform = () => {
-  const [form, setForm] = useState({});
+  const { form, setForm, handleOnchange } = useForm(initialState);
   const fields = [
     {
       label: "name",
@@ -13,6 +20,7 @@ const Signupform = () => {
       required: true,
       placeholder: "Enter your name",
       name: "name",
+      value: form.name,
     },
     {
       label: "email",
@@ -20,6 +28,7 @@ const Signupform = () => {
       required: true,
       placeholder: "Enter your email",
       name: "email",
+      value: form.email,
     },
     {
       label: "password",
@@ -27,6 +36,7 @@ const Signupform = () => {
       required: true,
       placeholder: "Enter your password",
       name: "password",
+      value: form.password,
     },
     {
       label: "Confirm Password",
@@ -34,14 +44,10 @@ const Signupform = () => {
       required: true,
       placeholder: "Confirm your password",
       name: "confirmPassword",
+      value: form.confirmPassword,
     },
   ];
 
-  const handleOnchange = (e) => {
-    const { name, value } = e.target;
-    console.log(name, value);
-    setForm({ ...form, [name]: value });
-  };
   const handleOnSubmit = async (e) => {
     e.preventDefault();
     const { confirmPassword, ...rest } = form;
@@ -55,6 +61,7 @@ const Signupform = () => {
 
     if (status === "success") {
       const responseMessage = data?.message || "Account created successfully";
+      setForm(initialState);
       const isErrorResponse = data?.status?.toLowerCase() === "error";
 
       if (isErrorResponse) {
