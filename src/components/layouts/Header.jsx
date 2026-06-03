@@ -5,8 +5,16 @@ import { Link } from "react-router-dom";
 import { ImExit } from "react-icons/im";
 import { FaReceipt, FaSignInAlt, FaTachometerAlt } from "react-icons/fa";
 import { MdLogin } from "react-icons/md";
+import { useUser } from "../../context/UserContext";
 
 export const Header = () => {
+  const { setUser } = useUser();
+  const handleOnlogout = () => {
+    alert("asd");
+    localStorage.removeItem("accessJWT");
+    //reset uer object from the state
+    setUser({});
+  };
   return (
     <Navbar expand="lg" variant="dark" className="mb-4">
       <Container>
@@ -30,7 +38,7 @@ export const Header = () => {
               <FaReceipt /> {""}
               Transaction
             </Link>
-            <Link className="nav-link" to="/">
+            <Link onClick={handleOnlogout} className="nav-link" to="/">
               <ImExit /> Logout
             </Link>
           </Nav>

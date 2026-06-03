@@ -61,6 +61,7 @@ const SignInform = () => {
       setForm(initialState);
       setUser(data.user);
       console.log(data.user, data.accessJWT);
+      localStorage.setItem("accessJWT", data.accessJWT);
     } catch (error) {
       console.log(error);
     }
@@ -76,9 +77,6 @@ const SignInform = () => {
           <Button variant="primary" type="submit">
             Sign In
           </Button>
-        </div>
-        <div className="text-center mt-3">
-          Already have an account? <a href="/login">Login</a>
         </div>
       </Form>
     </div>
