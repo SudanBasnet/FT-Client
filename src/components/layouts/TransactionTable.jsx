@@ -1,57 +1,102 @@
 import { Badge, Table } from "react-bootstrap";
+import { useUser } from "../../context/userContext";
 
 export const TransactionTable = () => {
-  const transactions = [
-    {
-      id: 1,
-      title: "Salary",
-      type: "income",
-      amount: 4200,
-      tdate: "2026-06-01",
-    },
-    {
-      id: 2,
-      title: "Groceries",
-      type: "expenses",
-      amount: 185,
-      tdate: "2026-06-02",
-    },
-    {
-      id: 3,
-      title: "Internet bill",
-      type: "expenses",
-      amount: 79,
-      tdate: "2026-06-03",
-    },
-  ];
+  const { transactions } = useUser();
+
+  const totalIncome = transactions.reduce((total, transaction) => {
+    if (transaction.type !== "income") {
+      return total;
+    }
+
+    return total + (Number(transaction.amount) || 0);
+  }, 0);
+
+  const totalExpense = transactions.reduce((total, transaction) => {
+    if (transaction.type === "income") {
+      return total;
+    }
+
+    return total + (Number(transaction.amount) || 0);
+  }, 0);
+
+  const totalBalance = totalIncome - totalExpense;
+
+  const formatAmount = (amount) => `$${Number(amount || 0).toLocaleString()}`;
 
   return (
-    <div>
-      <h3 className="mb-3">Transactions</h3>
-      <Table striped bordered hover responsive>
+    <div className="transaction-panel">
+      <div className="transaction-panel__header">
+        <div>
+          <p className="transaction-panel__label">Overview</p>
+          <h3 className="transaction-panel__title">Transactions</h3>
+        </div>
+        <div className="transaction-panel__balance">
+          <span>Total Balance</span>
+          <strong
+            className={totalBalance >= 0 ? "text-success" : "text-danger"}
+          >
+            {formatAmount(totalBalance)}
+          </strong>
+        </div>
+      </div>
+
+      <div className="transaction-summary">
+        <div className="transaction-summary__item">
+          <span>Income</span>
+          <strong className="text-success">{formatAmount(totalIncome)}</strong>
+        </div>
+        <div className="transaction-summary__item">
+          <span>Expense</span>
+          <strong className="text-danger">{formatAmount(totalExpense)}</strong>
+        </div>
+        <div className="transaction-summary__item">
+          <span>Records</span>
+          <strong>{transactions.length}</strong>
+        </div>
+      </div>
+
+      <Table className="transaction-table mb-0" hover responsive>
         <thead>
           <tr>
-            <th>#</th>
+            <th>No.</th>
             <th>Title</th>
             <th>Type</th>
-            <th>Amount</th>
+            <th>Income</th>
+            <th>Expense</th>
             <th>Date</th>
           </tr>
         </thead>
         <tbody>
-          {transactions.map(({ id, title, type, amount, tdate }) => (
-            <tr key={id}>
-              <td>{id}</td>
-              <td>{title}</td>
-              <td>
-                <Badge bg={type === "income" ? "success" : "danger"}>
-                  {type}
-                </Badge>
+          {transactions.length > 0 ? (
+            transactions.map(({ _id, title, type, amount, tdate }, index) => (
+              <tr key={_id}>
+                <td>{index + 1}</td>
+                <td className="transaction-table__title">{title}</td>
+                <td>
+                  <Badge
+                    className="transaction-table__badge"
+                    bg={type === "income" ? "success" : "danger"}
+                  >
+                    {type}
+                  </Badge>
+                </td>
+                <td className="text-success fw-semibold">
+                  {type === "income" ? formatAmount(amount) : "-"}
+                </td>
+                <td className="text-danger fw-semibold">
+                  {type !== "income" ? formatAmount(amount) : "-"}
+                </td>
+                <td>{new Date(tdate).toLocaleDateString()}</td>
+              </tr>
+            ))
+          ) : (
+            <tr>
+              <td colSpan="6" className="transaction-table__empty">
+                No transactions found.
               </td>
-              <td>${amount.toLocaleString()}</td>
-              <td>{tdate}</td>
             </tr>
-          ))}
+          )}
         </tbody>
       </Table>
     </div>
