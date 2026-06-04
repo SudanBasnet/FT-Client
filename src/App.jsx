@@ -7,8 +7,22 @@ import { DefaultLayout } from "./components/layouts/DefaultLayout.jsx";
 import Transaction from "./assets/pages/Transaction.jsx";
 import Dashboard from "./assets/pages/Dashboard.jsx";
 import { Auth } from "./auth/Auth.jsx";
+import { useEffect } from "react";
+import { useUser } from "./context/userContext.js";
+import { autoLogin } from "./utils/users.js";
 
 const App = () => {
+  const { user, setUser } = useUser();
+  useEffect(() => {
+    const updateUser = async () => {
+      const user = await autoLogin();
+      setUser(user || {});
+    };
+
+    //autologin
+    !user?._id && updateUser();
+  }, [user?._id, setUser]);
+
   return (
     <div className="wrapper">
       <Routes>

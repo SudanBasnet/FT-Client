@@ -3,21 +3,25 @@ import { CustomInput } from "./CustomInput";
 import useForm from "../hooks/useForm";
 import { loginUser } from "../../helpers/axiosHelper";
 import { toast } from "react-toastify";
-import { useUser } from "../context/UserContext";
+import { useUser } from "../context/userContext";
 import { useEffect } from "react";
-import { useNavigate } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 const initialState = {
   email: "",
   password: "",
 };
 
 const SignInform = () => {
+  const location = useLocation();
+  console.log(location);
   const navigate = useNavigate();
   const { user, setUser } = useUser();
   const { form, setForm, handleOnchange } = useForm(initialState);
+
+  const goTo = location?.state?.from?.pathname || "/dashboard";
   useEffect(() => {
-    user?._id && navigate("/dashboard");
-  }, [user?._id, navigate]);
+    user?._id && navigate(goTo);
+  }, [user?._id, navigate, goTo]);
   const fields = [
     {
       label: "email",

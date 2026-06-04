@@ -5,14 +5,13 @@ import { Link } from "react-router-dom";
 import { ImExit } from "react-icons/im";
 import { FaReceipt, FaSignInAlt, FaTachometerAlt } from "react-icons/fa";
 import { MdLogin } from "react-icons/md";
-import { useUser } from "../../context/UserContext";
+import { useUser } from "../../context/userContext";
 
 export const Header = () => {
-  const { setUser } = useUser();
+  const { user, setUser } = useUser();
   const handleOnlogout = () => {
-    alert("asd");
     localStorage.removeItem("accessJWT");
-    //reset uer object from the state
+    //reset user object from the state
     setUser({});
   };
   return (
@@ -22,25 +21,32 @@ export const Header = () => {
         <Navbar.Toggle aria-controls="basic-navbar-nav" />
         <Navbar.Collapse id="basic-navbar-nav">
           <Nav className="ms-auto">
-            <Link className="nav-link" to="/signup">
-              <FaSignInAlt /> {""}
-              Sign Up
-            </Link>
-            <Link className="nav-link" to="/">
-              <MdLogin /> {""}
-              Login In
-            </Link>
-            <Link className="nav-link" to="/dashboard">
-              <FaTachometerAlt /> {""}
-              Dashboard
-            </Link>
-            <Link className="nav-link" to="/transaction">
-              <FaReceipt /> {""}
-              Transaction
-            </Link>
-            <Link onClick={handleOnlogout} className="nav-link" to="/">
-              <ImExit /> Logout
-            </Link>
+            {user?._id ? (
+              <>
+                <Link className="nav-link" to="/dashboard">
+                  <FaTachometerAlt /> {""}
+                  Dashboard
+                </Link>
+                <Link className="nav-link" to="/transaction">
+                  <FaReceipt /> {""}
+                  Transaction
+                </Link>
+                <Link onClick={handleOnlogout} className="nav-link" to="/">
+                  <ImExit /> Logout
+                </Link>
+              </>
+            ) : (
+              <>
+                <Link className="nav-link" to="/signup">
+                  <FaSignInAlt /> {""}
+                  Sign Up
+                </Link>
+                <Link className="nav-link" to="/">
+                  <MdLogin /> {""}
+                  Login In
+                </Link>
+              </>
+            )}
           </Nav>
         </Navbar.Collapse>
       </Container>
