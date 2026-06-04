@@ -2,6 +2,8 @@ import { useState } from "react";
 import { Button, Form } from "react-bootstrap";
 import { CustomInput } from "../CustomInput";
 import useForm from "../../hooks/useForm";
+import { postNewTransaction } from "../../../helpers/axiosHelper";
+import { toast } from "react-toastify";
 
 const initialState = {
   type: "",
@@ -12,9 +14,17 @@ const initialState = {
 
 export const TransactionForm = () => {
   const { form, setForm, handleOnchange } = useForm(initialState);
-  const handleOnSubmit = (e) => {
+  const handleOnSubmit = async (e) => {
     e.preventDefault();
-    console.log(form);
+    const pending = postNewTransaction(form);
+    toast.promise(pending, {
+      pending: "please wait ...",
+    });
+    const { status, data, message } = await pending;
+    toast[status](data?.message || message || "transaction Submitted");
+
+    status === "sucess" && setForm(initialState);
+    //call the function to fetch all transactions
   };
   const fields = [
     // {

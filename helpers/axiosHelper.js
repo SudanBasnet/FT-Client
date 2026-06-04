@@ -61,3 +61,18 @@ export const getUser = (data) => {
   console.log(obj);
   return apiProcessr(obj);
 };
+
+//login user
+export const postNewTransaction = (data) => {
+  const obj = {
+    method: "post",
+    url: rootApiep + "/transactions",
+
+    headers: {
+      Authorization: getAccessJWT(),
+    },
+    data,
+  };
+  console.log(obj);
+  return apiProcessr(obj);
+};
