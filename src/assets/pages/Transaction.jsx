@@ -10,7 +10,13 @@ const Transaction = () => {
   const { getTransactions } = useUser();
   useEffect(() => {
     getTransactions();
-  }, []);
+
+    const intervalId = setInterval(() => {
+      getTransactions();
+    }, 10000);
+
+    return () => clearInterval(intervalId);
+  }, [getTransactions]);
   return (
     <Container>
       <Row className="bg-dark p-5 rounded">
