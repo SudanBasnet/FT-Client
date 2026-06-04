@@ -14,7 +14,7 @@ const initialState = {
 
 export const TransactionForm = () => {
   const { form, setForm, handleOnchange } = useForm(initialState);
-  const { getTransactions } = useUser();
+  const { getTransactions, toggleModal } = useUser();
   const handleOnSubmit = async (e) => {
     e.preventDefault();
     const pending = postNewTransaction(form);
@@ -26,17 +26,13 @@ export const TransactionForm = () => {
 
     if (status === "success") {
       setForm(initialState);
+      //fetched all transactions
       getTransactions();
+      //close the modal
+      toggleModal(false);
     }
   };
   const fields = [
-    // {
-    //   label: "Type",
-    //   type: "text",
-    //   required: true,
-    //   placeholder: "",
-    //   name: "name",
-    // },
     {
       label: "Title",
       type: "text",

@@ -5,6 +5,12 @@ import { fetchTransactions } from "../../helpers/axiosHelper";
 export const UserProvider = ({ children }) => {
   const [user, setUser] = useState({});
   const [transactions, setTransactions] = useState([]);
+
+  //!modal
+
+  const [show, setShow] = useState(false);
+
+  const toggleModal = (value) => setShow(value);
   const getTransactions = useCallback(async () => {
     //call axios helper to call api
     const { status, data } = await fetchTransactions();
@@ -15,7 +21,15 @@ export const UserProvider = ({ children }) => {
   }, []);
   return (
     <UserContext.Provider
-      value={{ user, setUser, transactions, setTransactions, getTransactions }}
+      value={{
+        user,
+        setUser,
+        transactions,
+        setTransactions,
+        getTransactions,
+        toggleModal,
+        show,
+      }}
     >
       {children}
     </UserContext.Provider>
