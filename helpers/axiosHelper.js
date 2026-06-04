@@ -37,7 +37,7 @@ export const postNewUser = (data) => {
   return apiProcessr(obj);
 };
 
-//login user
+//!login user
 export const loginUser = (data) => {
   const obj = {
     method: "post",
@@ -48,7 +48,7 @@ export const loginUser = (data) => {
   return apiProcessr(obj);
 };
 
-//get user profile
+//!get user profile
 export const getUser = (data) => {
   const obj = {
     method: "get",
@@ -62,10 +62,24 @@ export const getUser = (data) => {
   return apiProcessr(obj);
 };
 
-//login user
+//!login user
 export const postNewTransaction = (data) => {
   const obj = {
     method: "post",
+    url: rootApiep + "/transactions",
+
+    headers: {
+      Authorization: getAccessJWT(),
+    },
+    data,
+  };
+  console.log(obj);
+  return apiProcessr(obj);
+};
+//!fetch transaction for a specific user
+export const fetchTransactions = (data) => {
+  const obj = {
+    method: "get",
     url: rootApiep + "/transactions",
 
     headers: {

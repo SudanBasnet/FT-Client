@@ -3,6 +3,7 @@ import { CustomInput } from "./CustomInput";
 import { toast } from "react-toastify";
 import { postNewUser } from "../../helpers/axiosHelper";
 import useForm from "../hooks/useForm";
+import { Link } from "react-router-dom";
 
 const initialState = {
   name: "",
@@ -86,7 +87,7 @@ const Signupform = () => {
           </Button>
         </div>
         <div className="text-center mt-3">
-          Already have an account? <a href="/login">Login</a>
+          Already have an account? <Link to="/">Login</Link>
         </div>
       </Form>
     </div>
