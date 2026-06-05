@@ -9,8 +9,15 @@ export const UserProvider = ({ children }) => {
   //!modal
 
   const [show, setShow] = useState(false);
+  const [editingTransaction, setEditingTransaction] = useState(null);
 
-  const toggleModal = (value) => setShow(value);
+  const toggleModal = (value) => {
+    setShow(value);
+
+    if (!value) {
+      setEditingTransaction(null);
+    }
+  };
   const getTransactions = useCallback(async () => {
     //call axios helper to call api
     const { status, data, message } = await fetchTransactions();
@@ -34,6 +41,8 @@ export const UserProvider = ({ children }) => {
         getTransactions,
         toggleModal,
         show,
+        editingTransaction,
+        setEditingTransaction,
       }}
     >
       {children}

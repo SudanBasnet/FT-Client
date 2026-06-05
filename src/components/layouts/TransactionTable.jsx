@@ -1,13 +1,16 @@
 import { useEffect, useState } from "react";
-import { Badge, Button, Form, Table } from "react-bootstrap";
+import { Badge, Button, Form, Pagination, Table } from "react-bootstrap";
 import { useUser } from "../../context/userContext";
 import { deleteTransactions } from "../../../helpers/axiosHelper";
 import { toast } from "react-toastify";
 
 export const TransactionTable = () => {
-  const { transactions, getTransactions } = useUser();
+  const { transactions, getTransactions, toggleModal, setEditingTransaction } =
+    useUser();
   const [searchText, setSearchText] = useState("");
   const [selectedIds, setSelectedIds] = useState([]);
+  const [currentPage, setCurrentPage] = useState(1);
+  const pageSize = 5;
 
   const formatAmount = (amount) => `$${Number(amount || 0).toLocaleString()}`;
 
@@ -24,6 +27,7 @@ export const TransactionTable = () => {
     title: transaction.title || "Untitled transaction",
     type: transaction.type || "",
     amount: Number(transaction.amount) || 0,
+    rawDate: transaction.tdate,
     tdate: formatDate(transaction.tdate),
   }));
 
@@ -56,14 +60,23 @@ export const TransactionTable = () => {
   }, 0);
 
   const totalBalance = totalIncome - totalExpense;
+  const totalPages = Math.ceil(filteredTransactions.length / pageSize) || 1;
+  const startIndex = (currentPage - 1) * pageSize;
+  const paginatedTransactions = filteredTransactions.slice(
+    startIndex,
+    startIndex + pageSize,
+  );
 
   const filteredIds = filteredTransactions
     .map((transaction) => transaction._id)
     .filter(Boolean);
+  const currentPageIds = paginatedTransactions
+    .map((transaction) => transaction._id)
+    .filter(Boolean);
 
   const isAllSelected =
-    filteredIds.length > 0 &&
-    filteredIds.every((id) => selectedIds.includes(id));
+    currentPageIds.length > 0 &&
+    currentPageIds.every((id) => selectedIds.includes(id));
 
   const handleOnSelect = (e) => {
     const { checked, value } = e.target;
@@ -79,15 +92,25 @@ export const TransactionTable = () => {
     const { checked } = e.target;
 
     if (checked) {
-      setSelectedIds(filteredIds);
+      setSelectedIds((ids) => [...new Set([...ids, ...currentPageIds])]);
     } else {
-      setSelectedIds([]);
+      setSelectedIds((ids) => ids.filter((id) => !currentPageIds.includes(id)));
     }
   };
 
   useEffect(() => {
     setSelectedIds((ids) => ids.filter((id) => filteredIds.includes(id)));
   }, [searchText, transactions.length]);
+
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [searchText]);
+
+  useEffect(() => {
+    if (currentPage > totalPages) {
+      setCurrentPage(totalPages);
+    }
+  }, [currentPage, totalPages]);
 
   const handleOnDelete = async () => {
     if (
@@ -109,42 +132,53 @@ export const TransactionTable = () => {
     }
   };
 
+  const handleOnEdit = (transaction) => {
+    setEditingTransaction(transaction);
+    toggleModal(true);
+  };
+
   return (
-    <div className="transaction-panel">
-      <div className="transaction-panel__header">
+    <div className="card rounded-4 shadow overflow-hidden text-dark">
+      <div className="d-flex flex-column flex-sm-row gap-3 align-items-sm-center justify-content-between p-4 border-bottom">
         <div>
-          <p className="transaction-panel__label">Overview</p>
-          <h3 className="transaction-panel__title">
+          <p className="text-muted fw-bold text-uppercase mb-1">Overview</p>
+          <h3 className="fs-4 fw-bold mb-0">
             {filteredTransactions.length} Transactions Found
           </h3>
         </div>
-        <div className="transaction-panel__balance">
-          <span>Total Balance</span>
+        <div className="text-sm-end">
+          <span className="text-muted fw-bold">Total Balance</span>
           <strong
-            className={totalBalance >= 0 ? "text-success" : "text-danger"}
+            className={`d-block fs-4 ${
+              totalBalance >= 0 ? "text-success" : "text-danger"
+            }`}
           >
             {formatAmount(totalBalance)}
           </strong>
         </div>
       </div>
 
-      <div className="transaction-summary">
-        <div className="transaction-summary__item">
-          <span>Income</span>
-          <strong className="text-success">{formatAmount(totalIncome)}</strong>
+      <div className="row g-0 bg-light border-bottom">
+        <div className="col-md-4 p-3 border-end">
+          <span className="text-muted fw-bold">Income</span>
+          <strong className="d-block fs-5 text-success">
+            {formatAmount(totalIncome)}
+          </strong>
         </div>
-        <div className="transaction-summary__item">
-          <span>Expense</span>
-          <strong className="text-danger">{formatAmount(totalExpense)}</strong>
+        <div className="col-md-4 p-3 border-end">
+          <span className="text-muted fw-bold">Expense</span>
+          <strong className="d-block fs-5 text-danger">
+            {formatAmount(totalExpense)}
+          </strong>
         </div>
-        <div className="transaction-summary__item">
-          <span>Records</span>
-          <strong>{filteredTransactions.length}</strong>
+        <div className="col-md-4 p-3">
+          <span className="text-muted fw-bold">Records</span>
+          <strong className="d-block fs-5">{filteredTransactions.length}</strong>
         </div>
       </div>
 
-      <div className="transaction-search">
-        <input
+      <div className="p-3 border-bottom">
+        <Form.Control
           type="search"
           placeholder="Search by title, type, amount, or date"
           value={searchText}
@@ -153,7 +187,7 @@ export const TransactionTable = () => {
       </div>
 
       {selectedIds.length > 0 && (
-        <div className="transaction-selected">
+        <div className="px-4 py-2 border-bottom bg-info-subtle text-info-emphasis fw-bold">
           {selectedIds.length} selected
         </div>
       )}
@@ -173,44 +207,63 @@ export const TransactionTable = () => {
             <th>Income</th>
             <th>Expense</th>
             <th>Date</th>
+            <th>Action</th>
           </tr>
         </thead>
         <tbody>
-          {filteredTransactions.length > 0 ? (
-            filteredTransactions.map(
-              ({ _id, title, type, amount, tdate }, index) => (
-                <tr key={_id || index}>
-                  <td>
-                    <Form.Check
-                      disabled={!_id}
-                      checked={selectedIds.includes(_id)}
-                      value={_id}
-                      onChange={handleOnSelect}
-                    />
-                  </td>
-                  <td>{index + 1}</td>
-                  <td className="transaction-table__title">{title}</td>
-                  <td>
-                    <Badge
-                      className="transaction-table__badge"
-                      bg={type === "income" ? "success" : "danger"}
-                    >
-                      {type || "expense"}
-                    </Badge>
-                  </td>
-                  <td className="text-success fw-semibold">
-                    {type === "income" ? formatAmount(amount) : "-"}
-                  </td>
-                  <td className="text-danger fw-semibold">
-                    {type !== "income" ? formatAmount(amount) : "-"}
-                  </td>
-                  <td>{tdate}</td>
-                </tr>
-              ),
-            )
+          {paginatedTransactions.length > 0 ? (
+            paginatedTransactions.map((transaction, index) => (
+              <tr key={transaction._id || index}>
+                <td>
+                  <Form.Check
+                    disabled={!transaction._id}
+                    checked={selectedIds.includes(transaction._id)}
+                    value={transaction._id}
+                    onChange={handleOnSelect}
+                  />
+                </td>
+                <td>{startIndex + index + 1}</td>
+                <td className="transaction-table__title">
+                  {transaction.title}
+                </td>
+                <td>
+                  <Badge
+                    className="transaction-table__badge"
+                    bg={transaction.type === "income" ? "success" : "danger"}
+                  >
+                    {transaction.type || "expense"}
+                  </Badge>
+                </td>
+                <td className="text-success fw-semibold">
+                  {transaction.type === "income"
+                    ? formatAmount(transaction.amount)
+                    : "-"}
+                </td>
+                <td className="text-danger fw-semibold">
+                  {transaction.type !== "income"
+                    ? formatAmount(transaction.amount)
+                    : "-"}
+                </td>
+                <td>{transaction.tdate}</td>
+                <td>
+                  <Button
+                    size="sm"
+                    variant="outline-primary"
+                    onClick={() =>
+                      handleOnEdit({
+                        ...transaction,
+                        tdate: transaction.rawDate,
+                      })
+                    }
+                  >
+                    Edit
+                  </Button>
+                </td>
+              </tr>
+            ))
           ) : (
             <tr>
-              <td colSpan="7" className="transaction-table__empty">
+              <td colSpan="8" className="transaction-table__empty">
                 {transactions.length > 0
                   ? "No matching transactions found."
                   : "No transactions found."}
@@ -219,8 +272,36 @@ export const TransactionTable = () => {
           )}
         </tbody>
       </Table>
+      {filteredTransactions.length > pageSize && (
+        <div className="d-flex flex-column flex-sm-row gap-3 align-items-sm-center justify-content-between p-3 border-top">
+          <span className="text-muted fw-bold">
+            Showing {startIndex + 1}-
+            {Math.min(startIndex + pageSize, filteredTransactions.length)} of{" "}
+            {filteredTransactions.length}
+          </span>
+          <Pagination className="mb-0">
+            <Pagination.Prev
+              disabled={currentPage === 1}
+              onClick={() => setCurrentPage((page) => page - 1)}
+            />
+            {Array.from({ length: totalPages }, (_, index) => (
+              <Pagination.Item
+                key={index + 1}
+                active={currentPage === index + 1}
+                onClick={() => setCurrentPage(index + 1)}
+              >
+                {index + 1}
+              </Pagination.Item>
+            ))}
+            <Pagination.Next
+              disabled={currentPage === totalPages}
+              onClick={() => setCurrentPage((page) => page + 1)}
+            />
+          </Pagination>
+        </div>
+      )}
       {selectedIds.length > 0 && (
-        <div className="d-grid">
+        <div className="d-grid p-3 border-top">
           <Button variant="danger" onClick={handleOnDelete}>
             Delete {selectedIds.length} Transactions
           </Button>

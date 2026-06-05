@@ -3,7 +3,7 @@ import Modal from "react-bootstrap/Modal";
 import { useUser } from "../context/userContext";
 
 export const CustomModal = ({ children }) => {
-  const { toggleModal, show } = useUser();
+  const { toggleModal, show, setEditingTransaction } = useUser();
 
   return (
     <>
@@ -11,6 +11,7 @@ export const CustomModal = ({ children }) => {
         className="app-button mb-4"
         variant="primary"
         onClick={() => {
+          setEditingTransaction(null);
           toggleModal(true);
         }}
       >

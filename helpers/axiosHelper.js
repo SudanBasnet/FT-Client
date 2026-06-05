@@ -75,6 +75,22 @@ export const postNewTransaction = (data) => {
   console.log(obj);
   return apiProcessr(obj);
 };
+
+//!update transaction
+export const updateTransaction = (id, data) => {
+  const obj = {
+    method: "put",
+    url: rootApiep + "/transactions/" + id,
+
+    headers: {
+      Authorization: getAccessJWT(),
+    },
+    data,
+  };
+
+  return apiProcessr(obj);
+};
+
 //!fetch transaction for a specific user
 export const fetchTransactions = (data) => {
   const obj = {

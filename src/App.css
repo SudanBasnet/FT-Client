@@ -12,6 +12,18 @@
   min-height: calc(100vh - 132px);
 }
 
+.app-footer {
+  margin-top: 20px;
+  padding: 16px;
+  border: 1px solid rgba(148, 163, 184, 0.16);
+  border-radius: 14px;
+  background: rgba(15, 23, 42, 0.76);
+  color: #cbd5e1;
+  font-weight: 700;
+  box-shadow: 0 16px 44px rgba(0, 0, 0, 0.2);
+  backdrop-filter: blur(16px);
+}
+
 .page-container {
   padding-bottom: 32px;
 }
@@ -201,26 +213,6 @@
   font-weight: 700;
 }
 
-.dashboard-surface {
-  min-height: 360px;
-}
-
-.dashboard-orb {
-  display: grid;
-  width: min(220px, 60vw);
-  aspect-ratio: 1;
-  place-items: center;
-  border: 1px solid rgba(250, 204, 21, 0.4);
-  border-radius: 50%;
-  background: radial-gradient(circle, rgba(250, 204, 21, 0.24), rgba(20, 184, 166, 0.08));
-  color: #facc15;
-  font-size: 5rem;
-  font-weight: 900;
-  box-shadow:
-    0 0 32px rgba(250, 204, 21, 0.26),
-    inset 0 0 38px rgba(20, 184, 166, 0.18);
-}
-
 .dashboard-title {
   color: #f8fafc;
   font-weight: 850;
@@ -232,22 +224,40 @@
   font-size: 1.05rem;
 }
 
-.transaction-panel {
-  overflow: hidden;
-  border: 1px solid rgba(148, 163, 184, 0.2);
-  border-radius: 14px;
-  background: #ffffff;
-  color: #1f2937;
-  box-shadow: 0 16px 35px rgba(15, 23, 42, 0.16);
+.dashboard-balance-card {
+  min-width: 250px;
 }
 
-.transaction-panel__header {
+.dashboard-balance-card strong {
+  font-size: 2rem;
+  line-height: 1;
+}
+
+.min-w-0 {
+  min-width: 0;
+}
+
+.dashboard-chart {
+  min-height: 240px;
+}
+
+.dashboard-recent-item {
   display: flex;
-  gap: 16px;
+  min-width: 0;
+  gap: 12px;
   align-items: center;
   justify-content: space-between;
-  padding: 20px 22px;
+  padding: 8px 0;
   border-bottom: 1px solid #e5e7eb;
+}
+
+.dashboard-recent-item b {
+  flex: 0 0 auto;
+  white-space: nowrap;
+}
+
+.dashboard-recent-item:last-child {
+  border-bottom: 0;
 }
 
 .modal-content {
@@ -265,98 +275,6 @@
 
 .modal-body {
   padding: 0;
-}
-
-.transaction-panel__label {
-  margin: 0 0 4px;
-  color: #64748b;
-  font-size: 0.82rem;
-  font-weight: 700;
-  text-transform: uppercase;
-}
-
-.transaction-panel__title {
-  margin: 0;
-  color: #111827;
-  font-size: 1.45rem;
-  font-weight: 800;
-}
-
-.transaction-panel__balance {
-  display: grid;
-  gap: 2px;
-  text-align: right;
-}
-
-.transaction-panel__balance span,
-.transaction-summary__item span {
-  color: #64748b;
-  font-size: 0.86rem;
-  font-weight: 700;
-}
-
-.transaction-panel__balance strong {
-  font-size: 1.55rem;
-  line-height: 1.1;
-}
-
-.transaction-summary {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  border-bottom: 1px solid #e5e7eb;
-  background: #f8fafc;
-}
-
-.transaction-summary__item {
-  display: grid;
-  gap: 4px;
-  padding: 16px 22px;
-  border-right: 1px solid #e5e7eb;
-}
-
-.transaction-summary__item:last-child {
-  border-right: 0;
-}
-
-.transaction-summary__item strong {
-  color: #111827;
-  font-size: 1.2rem;
-}
-
-.transaction-search {
-  padding: 16px 22px;
-  border-bottom: 1px solid #e5e7eb;
-  background: #ffffff;
-}
-
-.transaction-search input {
-  width: 100%;
-  min-height: 44px;
-  padding: 10px 14px;
-  border: 1px solid #cbd5e1;
-  border-radius: 8px;
-  background: #f8fafc;
-  color: #111827;
-  font-size: 0.95rem;
-  outline: none;
-  transition:
-    border-color 150ms ease,
-    box-shadow 150ms ease,
-    background-color 150ms ease;
-}
-
-.transaction-search input:focus {
-  border-color: #2563eb;
-  background: #ffffff;
-  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.15);
-}
-
-.transaction-selected {
-  padding: 10px 22px;
-  border-bottom: 1px solid #e5e7eb;
-  background: #ecfeff;
-  color: #0f766e;
-  font-weight: 800;
 }
 
 .transaction-table {
@@ -401,6 +319,16 @@
   text-align: center;
 }
 
+.pagination .page-link {
+  color: #0f766e;
+  font-weight: 800;
+}
+
+.pagination .active .page-link {
+  border-color: #0f766e;
+  background: #0f766e;
+}
+
 @media (max-width: 575px) {
   .wrapper {
     padding: 12px;
@@ -415,27 +343,20 @@
     padding: 22px;
   }
 
-  .transaction-panel__header {
+  .dashboard-balance-card {
+    width: 100%;
+    min-width: 0;
+  }
+
+  .dashboard-recent-item {
     align-items: flex-start;
     flex-direction: column;
   }
 
-  .transaction-panel__balance {
-    text-align: left;
+  .dashboard-recent-item b {
+    white-space: normal;
   }
 
-  .transaction-summary {
-    grid-template-columns: 1fr;
-  }
-
-  .transaction-summary__item {
-    border-right: 0;
-    border-bottom: 1px solid #e5e7eb;
-  }
-
-  .transaction-summary__item:last-child {
-    border-bottom: 0;
-  }
 }
 
 @keyframes ledGlow {

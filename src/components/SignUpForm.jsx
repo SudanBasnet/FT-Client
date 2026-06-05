@@ -12,6 +12,14 @@ const initialState = {
   confirmPassword: "",
 };
 
+const isValidPassword = (password = "") => {
+  const hasMinLength = password.length >= 5;
+  const hasUpperCase = /[A-Z]/.test(password);
+  const hasSpecialCharacter = /[^A-Za-z0-9]/.test(password);
+
+  return hasMinLength && hasUpperCase && hasSpecialCharacter;
+};
+
 const Signupform = () => {
   const { form, setForm, handleOnchange } = useForm(initialState);
   const fields = [
@@ -35,7 +43,7 @@ const Signupform = () => {
       label: "password",
       type: "password",
       required: true,
-      placeholder: "Enter your password",
+      placeholder: "Min 5 chars, 1 uppercase, 1 special character",
       name: "password",
       value: form.password,
     },
@@ -54,6 +62,12 @@ const Signupform = () => {
     const { confirmPassword, ...rest } = form;
     if (confirmPassword !== rest.password) {
       return toast.error("Passwords do not match");
+    }
+
+    if (!isValidPassword(rest.password)) {
+      return toast.error(
+        "Password must be at least 5 characters and include one uppercase letter and one special character.",
+      );
     }
 
     const { status, data, message } = await postNewUser(rest);
