@@ -89,8 +89,6 @@ export const TransactionTable = () => {
     setSelectedIds((ids) => ids.filter((id) => filteredIds.includes(id)));
   }, [searchText, transactions.length]);
 
-  console.log("selected ids:", selectedIds);
-
   const handleOnDelete = async () => {
     if (
       confirm(

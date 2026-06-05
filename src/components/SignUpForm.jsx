@@ -55,8 +55,6 @@ const Signupform = () => {
     if (confirmPassword !== rest.password) {
       return toast.error("Passwords do not match");
     }
-    // const { status, message } = await postNewUser(rest);
-    // toast[status](message);
 
     const { status, data, message } = await postNewUser(rest);
 

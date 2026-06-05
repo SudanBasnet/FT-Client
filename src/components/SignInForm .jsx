@@ -13,7 +13,6 @@ const initialState = {
 
 const SignInform = () => {
   const location = useLocation();
-  console.log(location);
   const navigate = useNavigate();
   const { user, setUser, getTransactions } = useUser();
   const { form, setForm, handleOnchange } = useForm(initialState);
@@ -43,32 +42,19 @@ const SignInform = () => {
 
   const handleOnSubmit = async (e) => {
     e.preventDefault();
-    console.log(form);
 
     try {
-      const pendingResp = loginUser(form);
-
-      const { status, data, message } = await toast.promise(pendingResp, {
-        pending: "Please wait...",
-        success: {
-          render({ data }) {
-            return data?.data?.message || data?.message || "Login successful!";
-          },
-        },
-        error: {
-          render({ data }) {
-            return data?.message || "Login failed. Please try again.";
-          },
-        },
-      });
+      const toastId = toast.loading("Please wait...");
+      const { status, data, message } = await loginUser(form);
+      toast.dismiss(toastId);
 
       if (status !== "success" || !data?.accessJWT || !data?.user?._id) {
         return toast.error(message || data?.message || "Login failed.");
       }
 
+      toast.success(data?.message || "Login successful!");
       setForm(initialState);
       setUser(data.user);
-      console.log(data.user, data.accessJWT);
       localStorage.setItem("accessJWT", data.accessJWT);
       getTransactions();
     } catch (error) {

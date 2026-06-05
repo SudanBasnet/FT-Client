@@ -1,5 +1,5 @@
 import axios from "axios";
-const rootApiep = "http://localhost:8000/api/v1";
+const rootApiep = import.meta.env.VITE_ROOT_API + "/api/v1";
 
 const getAccessJWT = () => {
   return localStorage.getItem("accessJWT");
@@ -33,7 +33,6 @@ export const postNewUser = (data) => {
     url: rootApiep + "/users",
     data,
   };
-  console.log(obj);
   return apiProcessr(obj);
 };
 
@@ -44,7 +43,7 @@ export const loginUser = (data) => {
     url: rootApiep + "/users/login",
     data,
   };
-  console.log(obj);
+
   return apiProcessr(obj);
 };
 
@@ -58,7 +57,7 @@ export const getUser = (data) => {
     },
     data,
   };
-  console.log(obj);
+
   return apiProcessr(obj);
 };
 
