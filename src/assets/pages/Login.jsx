@@ -8,22 +8,19 @@ import SignInform from "../../components/SignInForm ";
 
 const Login = () => {
   return (
-    <Container>
-      <Row className="bg-dark p-5 rounded">
+    <Container className="page-container">
+      <Row className="app-surface align-items-center">
         <Col md={6}>
           <SignInform />
         </Col>
         <Col md={6}>
-          <div
-            className="d-flex flex-column justify-content-center fs-1"
-            style={{ height: "100%" }}
-          >
-            <div className="text-danger">
-              <FaDollarSign className="dollar-spin text-warning" />
+          <div className="auth-hero">
+            <div className="auth-hero__line">
+              <FaDollarSign className="dollar-spin" />
               Track Every Dollar
             </div>
-            <div className="text-success">
-              <FaChartLine className="text-success me-2" />
+            <div className="auth-hero__line auth-hero__line--muted">
+              <FaChartLine className="me-2" />
               Turn Small Savings Into Big Growth
             </div>
           </div>

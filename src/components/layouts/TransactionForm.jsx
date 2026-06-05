@@ -59,8 +59,9 @@ export const TransactionForm = () => {
     },
   ];
   return (
-    <div className="border p-4 rounded">
-      <h2 className="mb-4">Add your transaction</h2>
+    <div className="transaction-form-card">
+      <p className="auth-card__eyebrow">New record</p>
+      <h2 className="auth-card__title">Add your transaction</h2>
       <Form onSubmit={handleOnSubmit}>
         <Form.Group className="mb-3">
           <Form.Label>Transaction type</Form.Label>
@@ -74,7 +75,7 @@ export const TransactionForm = () => {
           <CustomInput key={input.name} {...input} onChange={handleOnchange} />
         ))}
         <div className="d-grid">
-          <Button variant="primary" type="submit">
+          <Button className="app-button" variant="primary" type="submit">
             Submit
           </Button>
         </div>

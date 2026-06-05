@@ -8,6 +8,7 @@ export const CustomModal = ({ children }) => {
   return (
     <>
       <Button
+        className="app-button mb-4"
         variant="primary"
         onClick={() => {
           toggleModal(true);

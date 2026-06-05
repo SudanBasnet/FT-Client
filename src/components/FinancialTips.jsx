@@ -66,28 +66,27 @@ export const FinancialTips = () => {
   const { tip, quote, author } = showQuote;
 
   useEffect(() => {
-    setInterval(() => {
+    const intervalId = setInterval(() => {
       setShowQuote(
         financialTips[Math.floor(Math.random() * financialTips.length)],
       );
     }, 3000);
+
+    return () => clearInterval(intervalId);
   }, []);
 
   return (
-    <div
-      className="d-flex flex-column justify-content-center"
-      style={{ height: "100%" }}
-    >
+    <div className="financial-tips">
       <div>
-        <GiCoins className="text-warning" style={{ fontSize: "10rem" }} />
-        <div className="">
-          <FaDollarSign className="text-warning" />
+        <GiCoins className="financial-tips__icon" />
+        <div className="financial-tips__headline">
+          <FaDollarSign />
           Watch your money Grow
-          <FaDollarSign className="text-warning" />
+          <FaDollarSign />
         </div>
       </div>
       <h3>{tip}</h3>
-      <div className="fw-bolder">"{quote}"</div>
+      <div className="financial-tips__quote">"{quote}"</div>
       <p> - {author}</p>
     </div>
   );

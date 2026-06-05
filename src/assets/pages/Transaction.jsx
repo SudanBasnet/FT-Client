@@ -8,8 +8,12 @@ import { useUser } from "../../context/userContext.js";
 import { CustomModal } from "../../components/CustomModal.jsx";
 
 const Transaction = () => {
-  const { getTransactions } = useUser();
+  const { user, getTransactions } = useUser();
   useEffect(() => {
+    if (!user?._id) {
+      return;
+    }
+
     getTransactions();
 
     const intervalId = setInterval(() => {
@@ -17,10 +21,10 @@ const Transaction = () => {
     }, 10000);
 
     return () => clearInterval(intervalId);
-  }, [getTransactions]);
+  }, [user?._id, getTransactions]);
   return (
-    <Container>
-      <Row className="bg-dark p-5 rounded">
+    <Container className="page-container">
+      <Row className="app-surface">
         <Col>
           <CustomModal>
             <TransactionForm />

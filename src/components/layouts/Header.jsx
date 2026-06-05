@@ -15,9 +15,11 @@ export const Header = () => {
     setUser({});
   };
   return (
-    <Navbar expand="lg" variant="dark" className="mb-4">
+    <Navbar expand="lg" variant="dark" className="app-navbar mb-4">
       <Container>
-        <Navbar.Brand href="#home">Finance Tracker</Navbar.Brand>
+        <Navbar.Brand className="app-navbar__brand" href="#home">
+          Finance Tracker
+        </Navbar.Brand>
         <Navbar.Toggle aria-controls="basic-navbar-nav" />
         <Navbar.Collapse id="basic-navbar-nav">
           <Nav className="ms-auto">

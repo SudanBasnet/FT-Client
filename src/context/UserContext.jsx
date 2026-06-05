@@ -13,11 +13,16 @@ export const UserProvider = ({ children }) => {
   const toggleModal = (value) => setShow(value);
   const getTransactions = useCallback(async () => {
     //call axios helper to call api
-    const { status, data } = await fetchTransactions();
+    const { status, data, message } = await fetchTransactions();
 
     //receive datga and mount to transactions,setTransactions
 
-    status === "success" && setTransactions(data?.transactions || []);
+    if (status === "success") {
+      setTransactions(data?.transactions || []);
+    } else {
+      console.log("Unable to fetch transactions:", message);
+      setTransactions([]);
+    }
   }, []);
   return (
     <UserContext.Provider

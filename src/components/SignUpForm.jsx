@@ -75,14 +75,15 @@ const Signupform = () => {
     }
   };
   return (
-    <div className="border p-4 rounded">
-      <h2 className="mb-4">Create an Account</h2>
+    <div className="auth-card led-border">
+      <p className="auth-card__eyebrow">Start tracking today</p>
+      <h2 className="auth-card__title">Create an Account</h2>
       <Form onSubmit={handleOnSubmit}>
         {fields.map((input) => (
           <CustomInput key={input.name} {...input} onChange={handleOnchange} />
         ))}
         <div className="d-grid">
-          <Button variant="primary" type="submit">
+          <Button className="app-button" variant="primary" type="submit">
             Sign Up
           </Button>
         </div>

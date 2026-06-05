@@ -6,13 +6,13 @@ import Signupform from "../../components/SignUpForm";
 
 const Signup = () => {
   return (
-    <Container>
-      <Row className="bg-dark p-5 rounded">
-        <Col>
-          <FinancialTips />{" "}
+    <Container className="page-container">
+      <Row className="app-surface align-items-center">
+        <Col md={6}>
+          <FinancialTips />
         </Col>
 
-        <Col>
+        <Col md={6}>
           <Signupform />
         </Col>
       </Row>

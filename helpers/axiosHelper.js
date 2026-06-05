@@ -90,3 +90,19 @@ export const fetchTransactions = (data) => {
   console.log(obj);
   return apiProcessr(obj);
 };
+
+//!delete selected items
+
+export const deleteTransactions = (data) => {
+  const obj = {
+    method: "delete",
+    url: rootApiep + "/transactions",
+
+    headers: {
+      Authorization: getAccessJWT(),
+    },
+    data,
+  };
+
+  return apiProcessr(obj);
+};

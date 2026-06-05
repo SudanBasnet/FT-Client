@@ -8,7 +8,7 @@ export const DefaultLayout = () => {
       {/* nav bar */}
       <Header />
       {/* {page contents} */}
-      <main className="main">
+      <main className="main vh-100">
         {" "}
         <Outlet />
       </main>
