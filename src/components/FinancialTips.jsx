@@ -76,18 +76,18 @@ export const FinancialTips = () => {
   }, []);
 
   return (
-    <div className="financial-tips">
+    <div className="d-flex h-100 flex-column justify-content-center p-5">
       <div>
-        <GiCoins className="financial-tips__icon" />
-        <div className="financial-tips__headline">
+        <GiCoins className="display-1 mb-3" aria-hidden="true" />
+        <div className="d-flex align-items-center gap-2 fw-semibold text-white-50">
           <FaDollarSign />
-          Watch your money Grow
+          Watch your money grow
           <FaDollarSign />
         </div>
       </div>
-      <h3>{tip}</h3>
-      <div className="financial-tips__quote">"{quote}"</div>
-      <p> - {author}</p>
+      <h2 className="mt-4 fw-bold">{tip}</h2>
+      <blockquote className="mb-2 text-white-50">“{quote}”</blockquote>
+      <p className="mb-0 small">— {author}</p>
     </div>
   );
 };

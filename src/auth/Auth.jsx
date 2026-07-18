@@ -7,6 +7,6 @@ export const Auth = ({ children }) => {
   return user?._id ? (
     children
   ) : (
-    <Navigate to="/" replace state={{ from: location }} />
+    <Navigate to="/login" replace state={{ from: location }} />
   );
 };

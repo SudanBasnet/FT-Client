@@ -1,5 +1,6 @@
 import axios from "axios";
-const rootApiep = import.meta.env.VITE_ROOT_API + "/api/v1";
+const rootApiep =
+  (import.meta.env.VITE_ROOT_API || "").trim().replace(/\/$/, "") + "/api/v1";
 
 const getAccessJWT = () => {
   return localStorage.getItem("accessJWT");
@@ -72,7 +73,7 @@ export const postNewTransaction = (data) => {
     },
     data,
   };
-  console.log(obj);
+
   return apiProcessr(obj);
 };
 
@@ -102,7 +103,7 @@ export const fetchTransactions = (data) => {
     },
     data,
   };
-  console.log(obj);
+
   return apiProcessr(obj);
 };
 

@@ -1,8 +1,9 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { Badge, Button, Form, Pagination, Table } from "react-bootstrap";
 import { useUser } from "../../context/userContext";
 import { deleteTransactions } from "../../../helpers/axiosHelper";
-import { toast } from "react-toastify";
+import { AppSpinner } from "../AppSpinner";
+import { requestWithToast } from "../../utils/notifications";
 
 export const TransactionTable = () => {
   const { transactions, getTransactions, toggleModal, setEditingTransaction } =
@@ -10,6 +11,7 @@ export const TransactionTable = () => {
   const [searchText, setSearchText] = useState("");
   const [selectedIds, setSelectedIds] = useState([]);
   const [currentPage, setCurrentPage] = useState(1);
+  const [isDeleting, setIsDeleting] = useState(false);
   const pageSize = 5;
 
   const formatAmount = (amount) => `$${Number(amount || 0).toLocaleString()}`;
@@ -61,7 +63,8 @@ export const TransactionTable = () => {
 
   const totalBalance = totalIncome - totalExpense;
   const totalPages = Math.ceil(filteredTransactions.length / pageSize) || 1;
-  const startIndex = (currentPage - 1) * pageSize;
+  const activePage = Math.min(currentPage, totalPages);
+  const startIndex = (activePage - 1) * pageSize;
   const paginatedTransactions = filteredTransactions.slice(
     startIndex,
     startIndex + pageSize,
@@ -73,10 +76,11 @@ export const TransactionTable = () => {
   const currentPageIds = paginatedTransactions
     .map((transaction) => transaction._id)
     .filter(Boolean);
+  const validSelectedIds = selectedIds.filter((id) => filteredIds.includes(id));
 
   const isAllSelected =
     currentPageIds.length > 0 &&
-    currentPageIds.every((id) => selectedIds.includes(id));
+    currentPageIds.every((id) => validSelectedIds.includes(id));
 
   const handleOnSelect = (e) => {
     const { checked, value } = e.target;
@@ -98,47 +102,48 @@ export const TransactionTable = () => {
     }
   };
 
-  useEffect(() => {
-    setSelectedIds((ids) => ids.filter((id) => filteredIds.includes(id)));
-  }, [searchText, transactions.length]);
-
-  useEffect(() => {
+  const handleSearchChange = (e) => {
+    setSearchText(e.target.value);
     setCurrentPage(1);
-  }, [searchText]);
-
-  useEffect(() => {
-    if (currentPage > totalPages) {
-      setCurrentPage(totalPages);
-    }
-  }, [currentPage, totalPages]);
+    setSelectedIds([]);
+  };
 
   const handleOnDelete = async () => {
     if (
       confirm(
-        `Are you sure you want to delete ${selectedIds.length} transactions`,
+        `Are you sure you want to delete ${validSelectedIds.length} transactions`,
       )
     ) {
-      const pending = deleteTransactions({ ids: selectedIds });
-      toast.promise(pending, {
-        pending: "please wait ...",
-      });
-      const { status, data, message } = await pending;
-      toast[status](data?.message || message);
+      setIsDeleting(true);
+      const { status } = await requestWithToast(
+        deleteTransactions({ ids: validSelectedIds }),
+        {
+          pending: "Deleting selected transactions...",
+          success: "Transactions deleted.",
+          error: "Unable to delete the selected transactions.",
+        },
+      );
 
       if (status === "success") {
         setSelectedIds([]);
-        getTransactions();
+        await getTransactions();
       }
+
+      setIsDeleting(false);
     }
   };
 
   const handleOnEdit = (transaction) => {
+    if (isDeleting) {
+      return;
+    }
+
     setEditingTransaction(transaction);
     toggleModal(true);
   };
 
   return (
-    <div className="card rounded-4 shadow overflow-hidden text-dark">
+    <div className="card overflow-hidden border-0 text-dark shadow-sm">
       <div className="d-flex flex-column flex-sm-row gap-3 align-items-sm-center justify-content-between p-4 border-bottom">
         <div>
           <p className="text-muted fw-bold text-uppercase mb-1">Overview</p>
@@ -182,18 +187,18 @@ export const TransactionTable = () => {
           type="search"
           placeholder="Search by title, type, amount, or date"
           value={searchText}
-          onChange={(e) => setSearchText(e.target.value)}
+          onChange={handleSearchChange}
         />
       </div>
 
-      {selectedIds.length > 0 && (
+      {validSelectedIds.length > 0 && (
         <div className="px-4 py-2 border-bottom bg-info-subtle text-info-emphasis fw-bold">
-          {selectedIds.length} selected
+          {validSelectedIds.length} selected
         </div>
       )}
 
-      <Table className="transaction-table mb-0" hover responsive>
-        <thead>
+      <Table className="mb-0 align-middle" hover responsive>
+        <thead className="table-dark small text-uppercase">
           <tr>
             <th>
               <Form.Check
@@ -217,18 +222,16 @@ export const TransactionTable = () => {
                 <td>
                   <Form.Check
                     disabled={!transaction._id}
-                    checked={selectedIds.includes(transaction._id)}
+                    checked={validSelectedIds.includes(transaction._id)}
                     value={transaction._id}
                     onChange={handleOnSelect}
                   />
                 </td>
                 <td>{startIndex + index + 1}</td>
-                <td className="transaction-table__title">
-                  {transaction.title}
-                </td>
+                <td className="fw-semibold">{transaction.title}</td>
                 <td>
                   <Badge
-                    className="transaction-table__badge"
+                    className="px-2 py-2 text-capitalize"
                     bg={transaction.type === "income" ? "success" : "danger"}
                   >
                     {transaction.type || "expense"}
@@ -249,6 +252,7 @@ export const TransactionTable = () => {
                   <Button
                     size="sm"
                     variant="outline-primary"
+                    disabled={isDeleting}
                     onClick={() =>
                       handleOnEdit({
                         ...transaction,
@@ -263,7 +267,10 @@ export const TransactionTable = () => {
             ))
           ) : (
             <tr>
-              <td colSpan="8" className="transaction-table__empty">
+              <td
+                colSpan="8"
+                className="py-5 text-center fw-semibold text-body-secondary"
+              >
                 {transactions.length > 0
                   ? "No matching transactions found."
                   : "No transactions found."}
@@ -281,29 +288,37 @@ export const TransactionTable = () => {
           </span>
           <Pagination className="mb-0">
             <Pagination.Prev
-              disabled={currentPage === 1}
-              onClick={() => setCurrentPage((page) => page - 1)}
+              disabled={activePage === 1}
+              onClick={() => setCurrentPage(activePage - 1)}
             />
             {Array.from({ length: totalPages }, (_, index) => (
               <Pagination.Item
                 key={index + 1}
-                active={currentPage === index + 1}
+                active={activePage === index + 1}
                 onClick={() => setCurrentPage(index + 1)}
               >
                 {index + 1}
               </Pagination.Item>
             ))}
             <Pagination.Next
-              disabled={currentPage === totalPages}
-              onClick={() => setCurrentPage((page) => page + 1)}
+              disabled={activePage === totalPages}
+              onClick={() => setCurrentPage(activePage + 1)}
             />
           </Pagination>
         </div>
       )}
-      {selectedIds.length > 0 && (
+      {validSelectedIds.length > 0 && (
         <div className="d-grid p-3 border-top">
-          <Button variant="danger" onClick={handleOnDelete}>
-            Delete {selectedIds.length} Transactions
+          <Button
+            variant="danger"
+            onClick={handleOnDelete}
+            disabled={isDeleting}
+          >
+            {isDeleting ? (
+              <AppSpinner label="Deleting..." compact />
+            ) : (
+              `Delete ${validSelectedIds.length} Transactions`
+            )}
           </Button>
         </div>
       )}

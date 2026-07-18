@@ -5,9 +5,11 @@ import {
   postNewTransaction,
   updateTransaction,
 } from "../../../helpers/axiosHelper";
-import { toast } from "react-toastify";
 import { useUser } from "../../context/userContext";
 import { useEffect } from "react";
+import { useState } from "react";
+import { AppSpinner } from "../AppSpinner";
+import { requestWithToast } from "../../utils/notifications";
 
 const initialState = {
   type: "",
@@ -20,6 +22,7 @@ export const TransactionForm = () => {
   const { form, setForm, handleOnchange } = useForm(initialState);
   const { getTransactions, toggleModal, editingTransaction } = useUser();
   const isEditing = Boolean(editingTransaction?._id);
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   useEffect(() => {
     if (editingTransaction?._id) {
@@ -38,25 +41,23 @@ export const TransactionForm = () => {
 
   const handleOnSubmit = async (e) => {
     e.preventDefault();
-    const pending = isEditing
+    setIsSubmitting(true);
+
+    const request = isEditing
       ? updateTransaction(editingTransaction._id, form)
       : postNewTransaction(form);
-
-    toast.promise(pending, {
-      pending: "please wait ...",
+    const { status } = await requestWithToast(request, {
+      pending: isEditing ? "Updating transaction..." : "Saving transaction...",
+      success: isEditing ? "Transaction updated." : "Transaction added.",
+      error: isEditing
+        ? "Unable to update the transaction."
+        : "Unable to add the transaction.",
     });
-    const { status, data, message } = await pending;
-    toast[status](
-      data?.message ||
-        message ||
-        (isEditing ? "Transaction updated" : "Transaction submitted"),
-    );
+    setIsSubmitting(false);
 
     if (status === "success") {
       setForm(initialState);
-      //fetched all transactions
-      getTransactions();
-      //close the modal
+      await getTransactions();
       toggleModal(false);
     }
   };
@@ -87,11 +88,11 @@ export const TransactionForm = () => {
     },
   ];
   return (
-    <div className="transaction-form-card">
-      <p className="auth-card__eyebrow">
+    <div className="bg-white p-4 text-dark">
+      <p className="mb-2 small fw-semibold text-uppercase text-primary">
         {isEditing ? "Edit record" : "New record"}
       </p>
-      <h2 className="auth-card__title">
+      <h2 className="h4 mb-4 fw-bold">
         {isEditing ? "Edit transaction" : "Add your transaction"}
       </h2>
       <Form onSubmit={handleOnSubmit}>
@@ -100,6 +101,7 @@ export const TransactionForm = () => {
           <Form.Select
             name="type"
             required
+            disabled={isSubmitting}
             value={form.type}
             onChange={handleOnchange}
           >
@@ -109,11 +111,30 @@ export const TransactionForm = () => {
           </Form.Select>
         </Form.Group>
         {fields.map((input) => (
-          <CustomInput key={input.name} {...input} onChange={handleOnchange} />
+          <CustomInput
+            key={input.name}
+            {...input}
+            disabled={isSubmitting}
+            onChange={handleOnchange}
+          />
         ))}
         <div className="d-grid">
-          <Button className="app-button" variant="primary" type="submit">
-            {isEditing ? "Update" : "Submit"}
+          <Button
+            className="py-2 fw-semibold"
+            variant="primary"
+            type="submit"
+            disabled={isSubmitting}
+          >
+            {isSubmitting ? (
+              <AppSpinner
+                label={isEditing ? "Updating..." : "Saving..."}
+                compact
+              />
+            ) : isEditing ? (
+              "Update"
+            ) : (
+              "Submit"
+            )}
           </Button>
         </div>
       </Form>

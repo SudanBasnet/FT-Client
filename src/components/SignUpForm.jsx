@@ -4,6 +4,9 @@ import { toast } from "react-toastify";
 import { postNewUser } from "../../helpers/axiosHelper";
 import useForm from "../hooks/useForm";
 import { Link } from "react-router-dom";
+import { useState } from "react";
+import { AppSpinner } from "./AppSpinner";
+import { requestWithToast } from "../utils/notifications";
 
 const initialState = {
   name: "",
@@ -22,6 +25,7 @@ const isValidPassword = (password = "") => {
 
 const Signupform = () => {
   const { form, setForm, handleOnchange } = useForm(initialState);
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const fields = [
     {
       label: "name",
@@ -70,38 +74,55 @@ const Signupform = () => {
       );
     }
 
-    const { status, data, message } = await postNewUser(rest);
+    setIsSubmitting(true);
+
+    const { status } = await requestWithToast(postNewUser(rest), {
+      pending: "Creating your account...",
+      success: "Account created successfully.",
+      error: "Unable to create your account.",
+    });
+
+    setIsSubmitting(false);
 
     if (status === "success") {
-      const responseMessage = data?.message || "Account created successfully";
       setForm(initialState);
-      const isErrorResponse = data?.status?.toLowerCase() === "error";
-
-      if (isErrorResponse) {
-        toast.error(responseMessage);
-      } else {
-        toast.success(responseMessage);
-      }
-    } else {
-      toast.error(message || data?.message || "Something went wrong");
     }
   };
   return (
-    <div className="auth-card led-border">
-      <p className="auth-card__eyebrow">Start tracking today</p>
-      <h2 className="auth-card__title">Create an Account</h2>
+    <div className="bg-white p-4 p-md-5">
+      <p className="mb-2 small fw-semibold text-uppercase text-primary">
+        Start tracking today
+      </p>
+      <h1 className="h3 fw-bold">Create your account</h1>
+      <p className="mb-4 text-body-secondary">
+        Set up your account and start organizing your finances.
+      </p>
       <Form onSubmit={handleOnSubmit}>
         {fields.map((input) => (
-          <CustomInput key={input.name} {...input} onChange={handleOnchange} />
+          <CustomInput
+            key={input.name}
+            {...input}
+            disabled={isSubmitting}
+            onChange={handleOnchange}
+          />
         ))}
         <div className="d-grid">
-          <Button className="app-button" variant="primary" type="submit">
-            Sign Up
+          <Button
+            className="py-2 fw-semibold"
+            variant="primary"
+            type="submit"
+            disabled={isSubmitting}
+          >
+            {isSubmitting ? (
+              <AppSpinner label="Creating account..." compact />
+            ) : (
+              "Sign Up"
+            )}
           </Button>
         </div>
-        <div className="text-center mt-3">
-          Already have an account? <Link to="/">Login</Link>
-        </div>
+        <p className="mb-0 mt-4 text-center text-body-secondary">
+          Already have an account? <Link to="/login">Sign in</Link>
+        </p>
       </Form>
     </div>
   );

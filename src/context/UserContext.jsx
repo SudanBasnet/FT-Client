@@ -5,6 +5,7 @@ import { fetchTransactions } from "../../helpers/axiosHelper";
 export const UserProvider = ({ children }) => {
   const [user, setUser] = useState({});
   const [transactions, setTransactions] = useState([]);
+  const [hasLoadedTransactions, setHasLoadedTransactions] = useState(false);
 
   //!modal
 
@@ -19,18 +20,24 @@ export const UserProvider = ({ children }) => {
     }
   };
   const getTransactions = useCallback(async () => {
-    //call axios helper to call api
-    const { status, data, message } = await fetchTransactions();
+    try {
+      const { status, data, message } = await fetchTransactions();
 
-    //receive datga and mount to transactions,setTransactions
-
-    if (status === "success") {
-      setTransactions(data?.transactions || []);
-    } else {
-      console.log("Unable to fetch transactions:", message);
-      setTransactions([]);
+      if (status === "success") {
+        setTransactions(data?.transactions || []);
+      } else {
+        console.log("Unable to fetch transactions:", message);
+        setTransactions([]);
+      }
+    } finally {
+      setHasLoadedTransactions(true);
     }
   }, []);
+
+  const clearTransactions = () => {
+    setTransactions([]);
+    setHasLoadedTransactions(false);
+  };
   return (
     <UserContext.Provider
       value={{
@@ -38,7 +45,9 @@ export const UserProvider = ({ children }) => {
         setUser,
         transactions,
         setTransactions,
+        hasLoadedTransactions,
         getTransactions,
+        clearTransactions,
         toggleModal,
         show,
         editingTransaction,

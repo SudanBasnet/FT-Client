@@ -8,7 +8,7 @@ export const CustomModal = ({ children }) => {
   return (
     <>
       <Button
-        className="app-button mb-4"
+        className="mb-4 fw-semibold"
         variant="primary"
         onClick={() => {
           setEditingTransaction(null);
@@ -24,9 +24,10 @@ export const CustomModal = ({ children }) => {
         backdrop="static"
         keyboard={false}
         centered
+        contentClassName="overflow-hidden border-0"
       >
-        <Modal.Header closeButton></Modal.Header>
-        <Modal.Body>{children}</Modal.Body>
+        <Modal.Header className="border-0 pb-0" closeButton />
+        <Modal.Body className="p-0">{children}</Modal.Body>
       </Modal>
     </>
   );

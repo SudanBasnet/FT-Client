@@ -6,9 +6,10 @@ import { TransactionTable } from "../../components/layouts/TransactionTable";
 import { useEffect } from "react";
 import { useUser } from "../../context/userContext.js";
 import { CustomModal } from "../../components/CustomModal.jsx";
+import { AppSpinner } from "../../components/AppSpinner.jsx";
 
 const Transaction = () => {
-  const { user, getTransactions } = useUser();
+  const { user, getTransactions, hasLoadedTransactions } = useUser();
   useEffect(() => {
     if (!user?._id) {
       return;
@@ -22,9 +23,18 @@ const Transaction = () => {
 
     return () => clearInterval(intervalId);
   }, [user?._id, getTransactions]);
+
+  if (!hasLoadedTransactions) {
+    return (
+      <Container className="py-5">
+        <AppSpinner label="Loading your transactions..." />
+      </Container>
+    );
+  }
+
   return (
-    <Container className="page-container">
-      <Row className="app-surface">
+    <Container className="py-4">
+      <Row>
         <Col>
           <CustomModal>
             <TransactionForm />

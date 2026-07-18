@@ -4,15 +4,11 @@ import { Outlet } from "react-router-dom";
 
 export const DefaultLayout = () => {
   return (
-    <div>
-      {/* nav bar */}
+    <div className="d-flex min-vh-100 flex-column bg-body-tertiary">
       <Header />
-      {/* {page contents} */}
-      <main className="main">
+      <main className="flex-grow-1">
         <Outlet />
       </main>
-
-      {/* footer */}
       <Footer />
     </div>
   );

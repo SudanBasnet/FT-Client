@@ -15,9 +15,15 @@ import {
   XAxis,
   YAxis,
 } from "recharts";
+import { AppSpinner } from "../../components/AppSpinner";
 
 const Dashboard = () => {
-  const { user, transactions, getTransactions } = useUser();
+  const {
+    user,
+    transactions,
+    getTransactions,
+    hasLoadedTransactions,
+  } = useUser();
   const [recentPage, setRecentPage] = useState(1);
 
   useEffect(() => {
@@ -55,17 +61,12 @@ const Dashboard = () => {
   const recentTransactions = [...transactions].reverse();
   const recentTotalPages =
     Math.ceil(recentTransactions.length / recentPageSize) || 1;
-  const recentStartIndex = (recentPage - 1) * recentPageSize;
+  const activeRecentPage = Math.min(recentPage, recentTotalPages);
+  const recentStartIndex = (activeRecentPage - 1) * recentPageSize;
   const paginatedRecentTransactions = recentTransactions.slice(
     recentStartIndex,
     recentStartIndex + recentPageSize,
   );
-
-  useEffect(() => {
-    if (recentPage > recentTotalPages) {
-      setRecentPage(recentTotalPages);
-    }
-  }, [recentPage, recentTotalPages]);
 
   const expenseTransactions = transactions.filter(
     (transaction) => transaction.type !== "income",
@@ -90,22 +91,32 @@ const Dashboard = () => {
     .sort((a, b) => b.amount - a.amount)
     .slice(0, 4);
 
+  if (!hasLoadedTransactions) {
+    return (
+      <Container className="py-5">
+        <AppSpinner label="Loading your financial overview..." />
+      </Container>
+    );
+  }
+
   return (
-    <Container className="page-container">
-      <Row className="app-surface g-3">
+    <Container className="py-4">
+      <Row className="g-4">
         <Col xs={12}>
           <div className="d-flex flex-column flex-md-row gap-3 align-items-stretch justify-content-between mb-1">
             <div>
-              <p className="auth-card__eyebrow">Dashboard</p>
-              <h1 className="dashboard-title">
+              <p className="mb-2 small fw-semibold text-uppercase text-primary">
+                Dashboard
+              </p>
+              <h1 className="fw-bold">
                 Welcome {user.name || "back"}
               </h1>
-              <p className="dashboard-copy">
+              <p className="mb-0 text-body-secondary">
                 Track cash flow, spot spending patterns, and keep every money
                 decision visible.
               </p>
             </div>
-            <div className="card p-4 rounded-4 shadow dashboard-balance-card">
+            <div className="card border-0 p-4 shadow-sm">
               <span className="text-muted fw-bold text-uppercase">
                 Total Balance
               </span>
@@ -119,7 +130,7 @@ const Dashboard = () => {
         </Col>
 
         <Col md={4}>
-          <div className="card h-100 p-3 rounded-4 shadow">
+          <div className="card h-100 border-0 p-3 shadow-sm">
             <span className="text-muted fw-bold text-uppercase">Income</span>
             <strong className="fs-4 text-success">
               {formatAmount(totalIncome)}
@@ -127,7 +138,7 @@ const Dashboard = () => {
           </div>
         </Col>
         <Col md={4}>
-          <div className="card h-100 p-3 rounded-4 shadow">
+          <div className="card h-100 border-0 p-3 shadow-sm">
             <span className="text-muted fw-bold text-uppercase">Expense</span>
             <strong className="fs-4 text-danger">
               {formatAmount(totalExpense)}
@@ -135,7 +146,7 @@ const Dashboard = () => {
           </div>
         </Col>
         <Col md={4}>
-          <div className="card h-100 p-3 rounded-4 shadow">
+          <div className="card h-100 border-0 p-3 shadow-sm">
             <span className="text-muted fw-bold text-uppercase">
               Transactions
             </span>
@@ -144,14 +155,14 @@ const Dashboard = () => {
         </Col>
 
         <Col lg={7}>
-          <div className="card h-100 p-4 rounded-4 shadow overflow-hidden">
+          <div className="card h-100 overflow-hidden border-0 p-4 shadow-sm">
             <div className="d-flex gap-3 align-items-center justify-content-between mb-3">
               <h2 className="fs-5 fw-bold mb-0">Cash Flow</h2>
               <span className="text-muted fw-bold text-uppercase">
                 Income vs expense
               </span>
             </div>
-            <div className="dashboard-chart">
+            <div className="w-100">
               <ResponsiveContainer width="100%" height={240}>
                 <PieChart>
                   <Pie
@@ -180,12 +191,12 @@ const Dashboard = () => {
         </Col>
 
         <Col lg={5}>
-          <div className="card h-100 p-4 rounded-4 shadow overflow-hidden">
+          <div className="card d-flex h-100 flex-column overflow-hidden border-0 p-4 shadow-sm">
             <div className="d-flex gap-3 align-items-center justify-content-between mb-3">
               <h2 className="fs-5 fw-bold mb-0">Top Expenses</h2>
               <span className="text-muted fw-bold text-uppercase">By title</span>
             </div>
-            <div className="dashboard-chart">
+            <div className="d-flex w-100 flex-grow-1 align-items-center">
               {topExpenses.length > 0 ? (
                 <ResponsiveContainer width="100%" height={240}>
                   <BarChart data={topExpenses} layout="vertical">
@@ -204,14 +215,16 @@ const Dashboard = () => {
                   </BarChart>
                 </ResponsiveContainer>
               ) : (
-                <p className="text-muted fw-bold mb-0">No expenses yet.</p>
+                <p className="mb-0 fw-semibold text-body-secondary">
+                  No expenses yet.
+                </p>
               )}
             </div>
           </div>
         </Col>
 
         <Col xs={12}>
-          <div className="card p-4 rounded-4 shadow overflow-hidden">
+          <div className="card overflow-hidden border-0 p-4 shadow-sm">
             <div className="d-flex gap-3 align-items-center justify-content-between mb-3">
               <h2 className="fs-5 fw-bold mb-0">Recent Activity</h2>
               <span className="text-muted fw-bold text-uppercase">
@@ -222,7 +235,7 @@ const Dashboard = () => {
               {paginatedRecentTransactions.length > 0 ? (
                 paginatedRecentTransactions.map((transaction) => (
                   <div
-                    className="dashboard-recent-item"
+                    className="d-flex flex-column gap-2 border-bottom py-2 flex-sm-row align-items-sm-center justify-content-sm-between"
                     key={transaction._id}
                   >
                     <div className="d-grid min-w-0">
@@ -234,11 +247,11 @@ const Dashboard = () => {
                       </span>
                     </div>
                     <b
-                      className={
+                      className={`text-nowrap ${
                         transaction.type === "income"
                           ? "text-success"
                           : "text-danger"
-                      }
+                      }`}
                     >
                       {formatAmount(transaction.amount)}
                     </b>
@@ -260,21 +273,21 @@ const Dashboard = () => {
                 </span>
                 <Pagination className="mb-0">
                   <Pagination.Prev
-                    disabled={recentPage === 1}
-                    onClick={() => setRecentPage((page) => page - 1)}
+                    disabled={activeRecentPage === 1}
+                    onClick={() => setRecentPage(activeRecentPage - 1)}
                   />
                   {Array.from({ length: recentTotalPages }, (_, index) => (
                     <Pagination.Item
                       key={index + 1}
-                      active={recentPage === index + 1}
+                      active={activeRecentPage === index + 1}
                       onClick={() => setRecentPage(index + 1)}
                     >
                       {index + 1}
                     </Pagination.Item>
                   ))}
                   <Pagination.Next
-                    disabled={recentPage === recentTotalPages}
-                    onClick={() => setRecentPage((page) => page + 1)}
+                    disabled={activeRecentPage === recentTotalPages}
+                    onClick={() => setRecentPage(activeRecentPage + 1)}
                   />
                 </Pagination>
               </div>
